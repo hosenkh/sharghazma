@@ -18,7 +18,7 @@ server = function () {
   server = http.createServer(onRequest);
 
   init = function (route) {
-    server.listen(8081);
+    server.listen(8080);
   };
 
   return {init: init};
