@@ -8,7 +8,7 @@ Desktop.ini
 *.sublime-*
 
 # Modules
-/components
+/file/components
 
 # Ccompiled files
 /dist

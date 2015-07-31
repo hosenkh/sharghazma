@@ -3,11 +3,13 @@ router = function () {
   head = {"content-type": "text/html"},
 
   init = function (handle, pathname, response) {
-    if (typeof handle[pathname] === 'function') {
-      handle[pathname](response);
+    pathnameArray = pathname.split('/');
+    pathnameArray.shift();
+    pathnameArray[0] = '/'+pathnameArray[0];
+    if (typeof handle[pathnameArray[0]] === 'function') {
+      handle[pathnameArray[0]](response, pathname);
     } else {
-      response.writeHead(404, head);
-      response.write("<i>NOT FOUND</i>");
+      handle['/'](response, pathname);
     }
   };
   return {init: init};

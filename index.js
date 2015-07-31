@@ -4,9 +4,8 @@
   router = require("./router"),
   requestHandler = require("./requestHandlers"),
   handler = {
-    "/": requestHandler.home,
-    "/home": requestHandler.home,
-    "/upload": requestHandler.upload
+    "/": requestHandler.main,
+    "/ajax": requestHandler.ajax
   },
 
   init = function () {
