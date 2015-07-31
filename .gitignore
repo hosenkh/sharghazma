@@ -1,0 +1,17 @@
+# OS
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
+
+# Ide
+*.sublime-*
+
+# Modules
+/components
+
+# Ccompiled files
+/dist
+
+# Other
+npm-debug.log
