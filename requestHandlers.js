@@ -6,6 +6,7 @@ addressPurifier = function (address) {
   var
   pathnameArray = address.toString().split('/');
   pathnameArray.shift();
+  pathnameArray.shift();
   var purePath = '';
   for (var i in pathnameArray) {
     purePath += '/'+pathnameArray[i];
@@ -15,21 +16,19 @@ addressPurifier = function (address) {
 
 
 main = function (response, address) {
-  var purePath = addressPurifier(address);
-  if (purePath === '/') {
-    purePath += 'index.html';
+  var tempPath = address;
+  if (tempPath === '/') {
+    tempPath += 'index.html';
   }
-  console.log('./file'+purePath);
-  fileLoader(response, purePath);
+  // console.log('./file'+tempPath);
+  fileLoader(response, tempPath);
 };
+
 ajax = function (response, address) {
-  // var purePath = addressPurifier(address);
+  var purePath = addressPurifier(address);
   console.log('ajax');
 };
-file = function (response, address) {
-  purePath = addressPurifier(address);
-  fileLoader(response, purePath);
-};
+
 fileLoader = function (response, address) {
   var
   ext = path.extname(address),
@@ -54,7 +53,7 @@ fileLoader = function (response, address) {
     localPath += address;
     fs.exists(localPath, function(exists) {
       if(exists) {
-        console.log("Serving file: " + localPath);
+        // console.log("Serving file: " + localPath);
         var tempFile = fs.readFileSync(localPath);
         response.writeHead(200, {'Content-Type': validExt});
         response.end(tempFile);
@@ -70,4 +69,3 @@ fileLoader = function (response, address) {
 };
 exports['main'] = main;
 exports['ajax'] = ajax;
-exports['file'] = file;

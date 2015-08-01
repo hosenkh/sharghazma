@@ -15,6 +15,7 @@ server = function () {
       var
       pathUrl = request.url,
       path = url.parse(pathUrl).pathname;
+      console.log(path);
       route(handle, path, response);
     };
     server = http.createServer(onRequest);
