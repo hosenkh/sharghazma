@@ -9,6 +9,7 @@ Desktop.ini
 
 # Modules
 /file/components
+/node_modules
 
 # Ccompiled files
 /dist
