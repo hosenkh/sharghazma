@@ -42,6 +42,7 @@ fileLoader = function (response, address) {
     ".jpg": "image/jpeg",
     ".gif": "image/gif",
     ".png": "image/png",
+    ".ico": "image/icon",
     ".map": "application/x-navimap",
     ".woff": "application/font-woff",
     ".woff2": "application/font-woff2",
