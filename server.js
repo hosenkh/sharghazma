@@ -19,7 +19,7 @@ server = function () {
       route(handle, path, response);
     };
     server = http.createServer(onRequest);
-    server.listen(8080);
+    server.listen(8082);
   };
 
   return {init: init};
