@@ -1,6 +1,3 @@
-using all potentials of ng-route and ng-resource
-  get, post and query
+database, apearently mysql
 login
-uploading a file to the server
-database, maybe access
 polymer
