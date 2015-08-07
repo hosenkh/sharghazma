@@ -14,9 +14,9 @@ server = function () {
     onRequest = function (request, response) {
       var
       pathUrl = request.url,
+      method = request.method.toLowerCase(),
       path = url.parse(pathUrl).pathname;
-      console.log(path);
-      route(handle, path, response);
+      route(handle, path, response, url.parse(pathUrl).query, method);
     };
     server = http.createServer(onRequest);
     server.listen(8082);
