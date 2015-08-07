@@ -1,5 +1,6 @@
 fs = require('fs');
 path = require('path');
+querystring = require('querystring');
 
 addressPurifier = function (address) {
   address = address.toString();
@@ -24,9 +25,18 @@ main = function (response, address) {
   fileLoader(response, tempPath);
 };
 
-ajax = function (response, address) {
-  var purePath = addressPurifier(address);
-  console.log('ajax');
+db = function (response, address, queryOptions, method) {
+  var purePath = addressPurifier(address),
+  queryObj = querystring.parse(queryOptions);
+  if (method == 'get') {
+    
+  }
+};
+
+save = function (response, address, queryOptions, method) {
+  if (method == 'post') {
+    console.log(queryOptions);
+  }
 };
 
 fileLoader = function (response, address) {
@@ -69,4 +79,5 @@ fileLoader = function (response, address) {
   }
 };
 exports['main'] = main;
-exports['ajax'] = ajax;
+exports['db'] = db;
+exports['save'] = save;
