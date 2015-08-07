@@ -5,7 +5,7 @@
   requestHandler = require("./requestHandlers"),
   handler = {
     "/": requestHandler.main,
-    "/ajax": requestHandler.ajax
+    "/db": requestHandler.db,
   },
 
   init = function () {
