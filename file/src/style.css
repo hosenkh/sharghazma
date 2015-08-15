@@ -1,6 +1,7 @@
 input, body {
-  direction: rtl;
+  /*direction: rtl;*/
   font-family: nazanin;
+  padding: 40px;
 }
 .result {
   direction: ltr;
