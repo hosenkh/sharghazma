@@ -14,6 +14,10 @@
         templateUrl: 'partials/table.html',
         controller: 'tableControl'
       })
+      .when('/polymer', {
+        templateUrl: 'partials/polymerTest.html',
+        controller: 'polymerTestControl'
+      })
       .otherwise({
         redirectTo: '/set'
       });

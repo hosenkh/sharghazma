@@ -187,6 +187,14 @@
   },
 
   /**
+   * the controller to test polymer
+   * @param  {angular injection} $scope [description]
+   */
+  polymerTestController = function($scope) {
+
+  },
+
+  /**
    * app initializer
    * @return {[type]} [description]
    */
@@ -194,7 +202,8 @@
     ng
       .module('main', ['ngResource'])
       .controller('mainControl', ['$scope', '$resource', mainController])
-      .controller('tableControl', ['$scope', tableController]);
+      .controller('tableControl', ['$scope', tableController])
+      .controller('polymerTestControl', ['$scope', polymerTestController]);
   }
   ;
   return {init: init};
