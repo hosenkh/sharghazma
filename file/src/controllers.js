@@ -149,6 +149,7 @@
 
   tableData = [],
 
+
   /**
    * the controller for the main page
    * @param  {angular injection} $scope the scope
@@ -190,8 +191,34 @@
    * the controller to test polymer
    * @param  {angular injection} $scope [description]
    */
-  polymerTestController = function($scope) {
-
+  polymerTestController = function($scope, $resource) {
+    $scope.post = function (username, password) {
+      var resource = $resource('/login?username='+username+'&password='+password);
+      postFunction = function (data) {
+        var log = '';
+        for (var i in data) {
+          if (typeof (data[i]) == 'string') {
+            log += data[i];
+          }
+        }
+        switch (log) {
+          case 'login successful':
+            console.log('login successful');
+          break;
+          case 'password incorrect':
+            $scope.password = '';
+            console.log('password incorrect');
+          break;
+          case 'no such user':
+            $scope.username = '';
+            $scope.password = '';
+            console.log('no such user');
+          break;
+        }
+        // console.log(log);
+      };
+      resource.save(postFunction);
+    };
   },
 
   /**
@@ -203,7 +230,7 @@
       .module('main', ['ngResource'])
       .controller('mainControl', ['$scope', '$resource', mainController])
       .controller('tableControl', ['$scope', tableController])
-      .controller('polymerTestControl', ['$scope', polymerTestController]);
+      .controller('polymerTestControl', ['$scope', '$resource', polymerTestController]);
   }
   ;
   return {init: init};

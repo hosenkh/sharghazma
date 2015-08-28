@@ -1,13 +1,12 @@
-fs = require('fs');
-path = require('path');
+crypto = require('./encripter');
+fileLoader = require('./fileLoader');
 querystring = require('querystring');
+partialLoader = require('./partialLoader');
 
 addressPurifier = function (address) {
   address = address.toString();
   var
-  pathnameArray = address.toString().split('/');
-  pathnameArray.shift();
-  pathnameArray.shift();
+  pathnameArray = address.toString().split('/').shift().shift();
   var purePath = '';
   for (var i in pathnameArray) {
     purePath += '/'+pathnameArray[i];
@@ -15,17 +14,31 @@ addressPurifier = function (address) {
   return purePath;
 };
 
+queryParser = function (query) {
+  var
+  splittedQuery = query.split('&'),
+  parsedQuery = {};
+  for (var i in splittedQuery) {
+    var command = splittedQuery[i].split('=');
+    parsedQuery[command[0]] = command[1];
+  }
+  return parsedQuery;
+};
 
-main = function (response, address) {
+
+main = function (response, address, cookies) {
   var tempPath = address;
   if (tempPath === '/') {
     tempPath += 'index.html';
   }
-  // console.log('./file'+tempPath);
-  fileLoader(response, tempPath);
+  if (tempPath.split('/')[1]=='partials') {
+    partialLoader.load(response, tempPath, cookies);
+  } else {
+    fileLoader.load(response, tempPath);
+  }
 };
 
-db = function (response, address, queryOptions, method) {
+db = function (response, address, queryOptions, method, cookies) {
   var purePath = addressPurifier(address),
   queryObj = querystring.parse(queryOptions);
   if (method == 'get') {
@@ -33,51 +46,50 @@ db = function (response, address, queryOptions, method) {
   }
 };
 
-save = function (response, address, queryOptions, method) {
+save = function (response, address, queryOptions, method, cookies) {
   if (method == 'post') {
     console.log(queryOptions);
   }
 };
 
-fileLoader = function (response, address) {
+login = function (response, address, queryOptions, method, cookies) {
   var
-  ext = path.extname(address),
-  localPath = './file',
-  validExtensions = {
-    ".html": "text/html",
-    ".js": "text/javascript",
-    ".css": "text/css",
-    ".txt": "text/plain",
-    ".json": "text/json",
-    ".jpg": "image/jpeg",
-    ".gif": "image/gif",
-    ".png": "image/png",
-    ".ico": "image/icon",
-    ".map": "application/x-navimap",
-    ".woff": "application/font-woff",
-    ".woff2": "application/font-woff2",
-    ".ttf": "application/octet-stream"
-  },
-  validExt = validExtensions[ext];
-  if (validExt) {
-    
-    localPath += address;
-    fs.exists(localPath, function(exists) {
-      if(exists) {
-        // console.log("Serving file: " + localPath);
-        var tempFile = fs.readFileSync(localPath);
-        response.writeHead(200, {'Content-Type': validExt});
-        response.end(tempFile);
-      } else {
-        console.log("File not found: " + localPath);
-        response.writeHead(404);
+  users = [
+    {username: 'ali', password: '1234'},
+    {username: 'hosein', password: '2345'}
+  ],
+  query = queryParser(queryOptions),
+  found = false;
+  if (cookies.user) {
+    console.log(crypto.decrypt(cookies.user));
+  }
+  if (method == 'post' && address == '/login') {
+    for (var i in users) {
+      if (users[i].username == query.username) {
+        if (users[i].password == query.password) {
+          response.writeHead(200, {
+            'set-cookie': 'user='+crypto.encrypt(query.username)+';httpOnly=true;expires='+new Date(new Date().getTime()+60000).toUTCString()
+          });
+          response.write('login successful');
+          response.end();
+        } else {
+          response.writeHead(200, {
+            'set-cookie': 'user='
+          });
+          response.write('password incorrect');
+          response.end();
+        }
+        found = true;
       }
-    });
-
-  } else {
-    console.log("Invalid file extension detected: " + ext);
+    }
+    if (!found) {
+        response.write('no such user');
+        response.end();
+    }
   }
 };
+
 exports['main'] = main;
 exports['db'] = db;
 exports['save'] = save;
+exports['login'] = login;

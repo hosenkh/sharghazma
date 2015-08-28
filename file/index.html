@@ -10,6 +10,8 @@
   <link rel="stylesheet" href="components/paper-styles/color.html">
   <link rel="stylesheet" href="src/style.css">
   <link rel="import" href="components/paper-styles/demo-pages.html">
+  <link rel="import" href="components/iron-meta/iron-meta.html">
+  <link rel="import" href="src/validator.html">
 </head>
 <body ng-app="router" unresolved>
   <div ng-view></div>
@@ -22,5 +24,15 @@
   <script type="text/javascript" src="src/polymerScripts.js"></script>
   <script type="text/javascript" src="src/controllers.js"></script>
   <script type="text/javascript" src="src/router.js"></script>
+  <script>
+  //   document.addEventListener('WebComponentsReady', function() {
+  //     var validator = new Polymer.IronMeta({type: 'validator'}).byKey('custom-validator');
+  //     var scope = document.querySelector('template[is=dom-bind]');
+  //     scope.valid = true;
+  //     scope._onInput = function(event) {
+  //       this.valid = validator.validate(event.target.value);
+  //     };
+  //   });
+  // </script>
 </body>
 </html>
