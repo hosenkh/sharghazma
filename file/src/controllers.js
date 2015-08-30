@@ -188,10 +188,10 @@
   },
 
   /**
-   * the controller to test polymer
+   * the controller to login page
    * @param  {angular injection} $scope [description]
    */
-  polymerTestController = function($scope, $resource) {
+  loginController = function($scope, $resource) {
     $scope.post = function (username, password) {
       var resource = $resource('/login?username='+username+'&password='+password);
       postFunction = function (data) {
@@ -222,6 +222,22 @@
   },
 
   /**
+   * the function to control main user page when logged in
+   * @param  {Object} $scope    angular injection
+   * @param  {Object} $resource angular injection
+   */
+  pvuserController = function ($scope, $resource) {
+
+  },
+
+  /**
+   * the function to control a private examl=ple page
+   */
+  pvexampleController = function ($scope, $resource) {
+
+  },
+
+  /**
    * app initializer
    * @return {[type]} [description]
    */
@@ -230,7 +246,9 @@
       .module('main', ['ngResource'])
       .controller('mainControl', ['$scope', '$resource', mainController])
       .controller('tableControl', ['$scope', tableController])
-      .controller('polymerTestControl', ['$scope', '$resource', polymerTestController]);
+      .controller('loginControl', ['$scope', '$resource', loginController])
+      .controller('pvuserControl', ['$scope', '$resource', pvuserController])
+      .controller('pvexampleControl', ['$scope', '$resource', pvexampleController]);
   }
   ;
   return {init: init};

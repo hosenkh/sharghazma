@@ -6,7 +6,9 @@
   handler = {
     "/": requestHandler.main,
     "/db": requestHandler.db,
-    "/login": requestHandler.login
+    "/restricted": requestHandler.restricted,
+    "/login": requestHandler.login,
+    "/logout": requestHandler.logout
   },
 
   init = function () {

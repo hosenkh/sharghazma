@@ -22,7 +22,7 @@ server = function () {
       route(handle, path, response, url.parse(pathUrl).query, method, cookies);
     };
     server = http.createServer(onRequest);
-    server.listen(80);
+    server.listen(8082);
   };
 
   return {init: init};

@@ -7,16 +7,24 @@
   configurater = function(routeProvider){
     routeProvider
       .when('/set', {
-        templateUrl: 'partials/main.html',
+        templateUrl: 'restricted/main.html',
         controller: 'mainControl'
       })
       .when('/tabularResult', {
-        templateUrl: 'partials/table.html',
+        templateUrl: 'restricted/table.html',
         controller: 'tableControl'
       })
-      .when('/polymer', {
-        templateUrl: 'partials/polymerTest.html',
-        controller: 'polymerTestControl'
+      .when('/login', {
+        templateUrl: 'restricted/login.html',
+        controller: 'loginControl'
+      })
+      .when('/user', {
+        templateUrl: '/restricted/pvuser.html',
+        controller: 'pvuserControl'
+      })
+      .when('/example', {
+        templateUrl: '/restricted/pvexample.html',
+        controller: 'pvexampleControl'
       })
       .otherwise({
         redirectTo: '/set'

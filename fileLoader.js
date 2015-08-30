@@ -1,6 +1,6 @@
 fs = require('fs');
 path = require('path');
-load = function (response, address) {
+load = function (response, address, cookies) {
   var
   ext = path.extname(address),
   localPath = './file',
