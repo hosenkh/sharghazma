@@ -1,5 +1,6 @@
 server = function () {
   var
+  __ = require("underscore"),
   http = require("http"),
   url = require("url"),
   cookieParser = require('./cookieParser'),
@@ -15,11 +16,19 @@ server = function () {
   init = function (route, handle) {
     onRequest = function (request, response) {
       var
+      postData = '',
       pathUrl = request.url,
       method = request.method.toLowerCase(),
-      path = url.parse(pathUrl).pathname;
+      path = url.parse(pathUrl).pathname,
       cookies = cookieParser.parse(request.headers.cookie);
-      route(handle, path, response, url.parse(pathUrl).query, method, cookies);
+      request.setEncoding('utf8');
+      request.addListener("data", function(postDataChunk) {
+        postData += postDataChunk;
+        console.log("Received POST data chunk '"+ postDataChunk + "'.");
+      });
+      request.addListener("end", function() {
+        route(handle, path, response, url.parse(pathUrl).query, method, cookies, postData);
+      });
     };
     server = http.createServer(onRequest);
     server.listen(8082);

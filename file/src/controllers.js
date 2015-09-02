@@ -3,6 +3,8 @@
   mainJSON,
   jobs = [],
   selected = {},
+  login = false,
+  lastPage = '/#/',
 
   /**
    * the function to define a new job which adds a single job name to the jobs array
@@ -155,6 +157,7 @@
    * @param  {angular injection} $scope the scope
    */
   mainController = function($scope, $resource){
+    lastPage = '/#/set';
     _.extend($scope, {
       jobs: jobs,
       labels: labels,
@@ -192,9 +195,13 @@
    * @param  {angular injection} $scope [description]
    */
   loginController = function($scope, $resource) {
+    if (login) {
+      window.location = lastPage;
+    }
     $scope.post = function (username, password) {
-      var resource = $resource('/login?username='+username+'&password='+password);
-      postFunction = function (data) {
+      var resource = $resource('/login',{}, {save: {method: 'POST'}});
+      results = resource.save({username: username, password: password});
+      results.$promise.then(function(data){
         var log = '';
         for (var i in data) {
           if (typeof (data[i]) == 'string') {
@@ -204,6 +211,8 @@
         switch (log) {
           case 'login successful':
             console.log('login successful');
+            login = true;
+            window.location = lastPage;
           break;
           case 'password incorrect':
             $scope.password = '';
@@ -215,9 +224,7 @@
             console.log('no such user');
           break;
         }
-        // console.log(log);
-      };
-      resource.save(postFunction);
+      });
     };
   },
 
@@ -234,7 +241,7 @@
    * the function to control a private examl=ple page
    */
   pvexampleController = function ($scope, $resource) {
-
+    lastPage = '/#/example';
   },
 
   /**

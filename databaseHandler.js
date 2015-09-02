@@ -8,7 +8,8 @@ errorThrower = function (err) {
 conditionStringGenerator = function (importedCondition, conditions) {
   var
   conditionKeys = __.keys(conditions),
-  conditionString = '';
+  conditionString = '',
+  conjunction = '=';
   if (importedCondition) {
     conditionString += importedCondition;
     if (conditionKeys.length) {
@@ -16,7 +17,13 @@ conditionStringGenerator = function (importedCondition, conditions) {
     }
   }
   for (var i=0; i<conditionKeys.length; i++) {
-    conditionString += ' `'+ conditionKeys[i] + '` = "'+ conditions[conditionKeys[i]]+'" ';
+    if (conditions[conditionKeys[i]].length > 1) {
+      conjunction = ' IN ';
+    }
+    else {
+      conjunction = ' = ';
+    }
+    conditionString += ' `'+ conditionKeys[i] + '`'+ conjunction +'"'+ conditions[conditionKeys[i]].join()+'" ';
     if (conditionKeys[i+1]) {
       conditionString += ' AND ';
     }
@@ -55,15 +62,12 @@ dbEnd = function () {
  */
 dbCheckPermission = function (username, command, content, exportFunction) {
   var
-  finalPermission = {
-    permission: false,
-    information: ''
-  },
+  finalPermission = false,
   selectionArray = [
     {
       table: "users",
       conditions: {
-        Username: username
+        Username: [username]
       },
       exportFields: ["ID"]
     },
@@ -77,17 +81,16 @@ dbCheckPermission = function (username, command, content, exportFunction) {
       table: "permissions",
       importedCondition: "PermissionNameId",
       conditions: {
-        Content: content,
-        Command: command
+        Content: [content],
+        Command: [command]
       },
       exportFields: ["ID", "Information"]
     }
   ];
   dbStart();
   selector(selectionArray, function (results) {
-    if (results[0].ID){
-      finalPermission.permission = true;
-      finalPermission.information = results[0].Information;
+    if (results.length){
+      finalPermission = true;
     }
     exportFunction(finalPermission);
   });
@@ -99,18 +102,18 @@ dbCheckPermission = function (username, command, content, exportFunction) {
  * [
     {
       "table" : "table1",
-      "condition": {
-        "col1" : "val1",
-        "col2" : "val2"
+      "conditions": {
+        "col1" : ["val1"],
+        "col2" : ["val2"]
       },
       "exportFields" : ["col3"],
     },
     {
       "table" : "table2",
       "importedCondition": "col3",
-      "condition" : {
-        "col2" : "val3",
-        "col3" : "val4"
+      "conditions" : {
+        "col2" : ["val3"],
+        "col3" : ["val4", "val5"]
       },
       "exportFields": ["col5", "col6"]
     }
@@ -122,49 +125,69 @@ selector = function (selectionArray, resultFunction) {
   finalResults = [],
   importedConditionString = '',
   i = 0,
-  tempFunction = function() {levelSelector(selectionArray[i].table, importedConditionString, selectionArray[i].conditions, selectionArray[i].exportFields, function(results){
-    if (selectionArray[i+1]) {
-      for (var j in results) {
-        finalResults.push(results[j][selectionArray[i].exportFields]);
-      }
-      if (finalResults.length == 1) {
-        conjunction = '=';
-        cp ='';
+  tempFunction = function() {
+    levelSelector(selectionArray[i].table, importedConditionString, selectionArray[i].conditions, selectionArray[i].exportFields, function(results){
+      if (selectionArray[i+1]) {
+        for (var j in results) {
+          finalResults.push(results[j][selectionArray[i].exportFields]);
+        }
+        if (finalResults.length == 1) {
+          conjunction = '=';
+          cp ='';
+        } else {
+          conjunction = 'IN (';
+          cp = ')';
+        }
+        importedConditionString = '`'+selectionArray[i+1].importedCondition+'` '+conjunction+finalResults.join()+cp;
+        i++;
+        tempFunction();
       } else {
-        conjunction = 'IN (';
-        cp = ')';
+        resultFunction(results);
       }
-      importedConditionString = '`'+selectionArray[i+1].importedCondition+'` '+conjunction+finalResults.join()+cp;
-      i++;
-      tempFunction();
-    } else {
-      resultFunction(results);
-    }
-  });};
+    });
+  };
   tempFunction();
 };
 
 /**
  * the function to insert 1 row in a table
  * @param  {String} table           the table to be inserted in
- * @param  {Object} insertionObject has two prototypes: keys which is names of columns and values which is th data
+ * @param  {Object} insertionObject has the original form of data: {col1: "val1", col2: "val2"}
  */
 insertor = function (table ,insertionObject) {
+  var
+  keys = __.keys(insertionObject),
+  values = __.values(insertionObject);
   connection.query(
-    'INSERT INTO '+table+ '('+insertionObject.keys.join()+') VALUES ('+insertionObject.values.join()+')',
+    'INSERT INTO '+table+ '('+keys.join()+') VALUES ('+values.join()+')',
     errorThrower(err)
   );
 };
-
 /**
- * the function to update 1 row in a table or update a table by a formula
+ * the function to update 1 row in a table or update some rows by one set of data
  * @param  {String} table        the table to be updated
  * @param  {String} IDs          IDs separated by ,
- * @param  {String} updateString structure: `col1`=val1, `col2`=val2 ...
+ * @param  {Object} dataObj      the object containing the data in normal structure
  */
-updator = function (table, IDs, updateString) {
+updator = function (table, IDs, dataObj) {
+  var
+  conjunction = ' = ',
+  keys = __.keys(dataObj),
+  values = __.values(dataObj),
+  updateString = '';
+  if (IDs.length > 1) {
+    conjunction = ' IN ';
+  } else {
+    conjunction = ' = ';
+  }
+  for (var i=0; i<keys.length; i++) {
+    updateString += keys[i] + ' = ' + values[i];
+    if (keys[i+1]) {
+      updateString += ',';
+    }
+  }
   connection.query(
-    'UPDATE '+table+ 'SET '+updateString+ 'WHERE `ID` IN ('+IDs+')',
+    'UPDATE '+table+ 'SET '+updateString+ 'WHERE `ID`'+conjunction+'('+IDs.join()+')',
     errorThrower(err)
   );
 };
@@ -175,8 +198,15 @@ updator = function (table, IDs, updateString) {
  * @param  {String} IDs   IDs separated by ,
  */
 deletor = function (table, IDs) {
+  var
+  conjunction = ' = ';
+  if (IDs.length > 1) {
+    conjunction = ' IN ';
+  } else {
+    conjunction = ' = ';
+  }
   connection.query(
-    'DELETE FROM '+table+'WHERE `ID` IN'+IDs,
+    'DELETE FROM '+table+'WHERE `ID`'+conjunction+IDs.join(),
     errorThrower(err)
   );
 };
@@ -201,37 +231,121 @@ insertBulk = function (table, dataObj) {
 /**
  * the function to perform bulk update in a table
  * @param  {String} table   name of the table to be updated
- * @param  {Array} IDArray array of IDs of rows to be updated
- * @param  {Object} dataObj has two prototypes columns (an array) and data (an array of arrays)
+ * @param  {Object} dataObj has two prototypes IDs (an array) and data (an array of objects with normal structur)
  */
-updateBulk = function (table, IDArray, dataObj) {
-  for (var i in dataObj.data) {
-    var dataString = '`';
-    for (var j in dataObj.columns) {
-      dataString += dataObj.columns[j]+'`='+dataObj.data[i][j]+',';
+updateBulk = function (table, dataObj) {
+  for (var i in dataObj.IDs) {
+    var dataString = '`',
+    keys = __.keys(dataObj.data[i]);
+    for (var j=0; j<keys.length; j++) {
+      dataString += keys[j]+'` ='+dataObj.data[i][keys[j]];
+      if (keys[j+1]) {
+        dataString += ', ';
+      }
     }
-    dataString.slice(0,-1);
     connection.query(
-      'UPDATE '+table+ 'SET '+dataString+ 'WHERE `ID`='+IDArray[i],
+      'UPDATE '+table+ 'SET '+dataString+ 'WHERE `ID`='+dataObj.IDs[i],
       errorThrower(err)
     );
   }
 };
 
+permissionParser = function (username, selectionArray, command) {
+  var
+  permissionArray = [];
+  for (var i in selectionArray) {
+    permissionArray.push({username: username, command: "select", content: selectionArray[i].table});
+    for (var j in selectionArray[i].exportFields) {
+      var fieldArray = selectionArray[i].exportFields[j].split('.');
+      if (fieldArray.length == 2 && fieldArray[0] != selectionArray[i].table) {
+        permissionArray.push({username: username, command: "select", content: fieldArray[0]});
+      }
+    }
+  }
+  if (command != "select") {
+    permissionArray.push({username: username, command: command, content: selectionArray[selectionArray.length-1].table});
+  }
+  return permissionArray;
+};
+
+showLinkPermission = function (username, content, resultFunction) {
+  var
+  selectionArray = [
+    {
+      table: 'users',
+      conditions: {
+        username: username
+      },
+      exportFields: ['ID']
+    },
+    {
+      table: 'permissions',
+      importedCondition: ['UserId'],
+      conditions: {
+        command: ['show'],
+        content: [content]
+      },
+      exportFields: ["Information"]
+    }
+  ];
+  selector(selectionArray, resultFunction);
+};
+
 /**
  * the incoming function from request handler to perform an action an db
  * @param  {String} username        the requesting user
- * @param  {Array} selectionArray for inserting, only containig the table name, for other commands containing the selection informaion
+ * @param  {Array} selectionArray for inserting, bulk inserting and bulk updating, only contains the table name, for other commands contains the selection informaion
  * @param  {String} command         the action to perfor
  * @param  {Object} data            the data for inserting of updateStri
  * @param  {Function} resultFunction  the function to be done on results of selection (only in select queries)
  */
 dbRequest = function (username, selectionArray, command, data, resultFunction) {
+  var
+  totalPermission = true,
+  permissionArray = permissionParser(username, selectionArray, command);
   dbStart();
-  dbCheckPermission(username, command, ?);
-  
-  dbEnd();
+  for (var i in permissionArray) {
+    dbCheckPermission(permissionArray[i].username, permissionArray[i].command, permissionArray[i].content, function(finalPermission){
+      totalPermission = totalPermission && finalPermission;
+    });
+  }
+  if (totalPermission) {
+    if (typeof(selectionArray) == 'object') {
+      selector(selectionArray, function(results){
+        var IDArray = [];
+        for (var i in results) {
+          IDArray.push(results['ID']);
+        }
+        switch (command) {
+          case "select":
+            resultFunction(results);
+          break;
+          case "update":
+            updator(selectionArray[selectionArray.length-1].table, IDArray, data);
+          break;
+          case "delete":
+            deletor(selectionArray[selectionArray.length-1].table, IDArray);
+          break;
+        }
+      });
+    } else {
+      switch (command) {
+        case "insert":
+          insertor(selectionArray, data);
+          resultFunction(true);
+        break;
+        case "insertBulk":
+          insertBulk(selectionArray, data);
+          resultFunction(true);
+        break;
+        case "updateBulk":
+          updateBulk(selectionArray, data);
+        break;
+      }
+    }
+  }
 };
 
 exports.dbCheckPermission = dbCheckPermission;
 exports.dbRequest = dbRequest;
+exports.showLink = showLinkPermission;

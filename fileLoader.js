@@ -1,6 +1,6 @@
 fs = require('fs');
 path = require('path');
-load = function (response, address, cookies) {
+load = function (response, setCookies, address, cookies) {
   var
   ext = path.extname(address),
   localPath = './file',
@@ -27,7 +27,11 @@ load = function (response, address, cookies) {
       if(exists) {
         // console.log("Serving file: " + localPath);
         var tempFile = fs.readFileSync(localPath);
-        response.writeHead(200, {'Content-Type': validExt});
+        if (setCookies) {
+          response.writeHead(200, {'Content-Type': validExt, 'set-cookie': setCookies});
+        } else {
+          response.writeHead(200, {'Content-Type': validExt});
+        }
         response.end(tempFile);
       } else {
         console.log("File not found: " + localPath);

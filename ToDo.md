@@ -1,8 +1,7 @@
-db
-restricted
+invalid data in login page
 save
 postpone session expiration
-redirect-to cookie
+when the public user requests a private partial, the login page is returned but the route doesn't change
 console.log(data) instead of console.log(log) in controllers.js
 gulp
 

@@ -8,7 +8,8 @@
     "/db": requestHandler.db,
     "/restricted": requestHandler.restricted,
     "/login": requestHandler.login,
-    "/logout": requestHandler.logout
+    "/logout": requestHandler.logout,
+    "/save": requestHandler.save
   },
 
   init = function () {
