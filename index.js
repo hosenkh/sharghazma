@@ -9,7 +9,8 @@
     "/restricted": requestHandler.restricted,
     "/login": requestHandler.login,
     "/logout": requestHandler.logout,
-    "/save": requestHandler.save
+    "/save": requestHandler.save,
+    "/postpone": requestHandler.postpone
   },
 
   init = function () {

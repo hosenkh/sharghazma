@@ -3,7 +3,6 @@
   mainJSON,
   jobs = [],
   selected = {},
-  login = false,
   lastPage = '/#/',
 
   /**
@@ -157,7 +156,36 @@
    * @param  {angular injection} $scope the scope
    */
   mainController = function($scope, $resource){
-    lastPage = '/#/set';
+    $scope.common = commonScope.common;
+    $scope.common.postpone = function () {
+      $resource('/postpone').get();
+    };
+    $scope.common.getPermission = function (hash) {
+      $resource('/restricted', {hash: hash}).get().$promise.then(function(data) {
+        var log = '';
+        for (var i in data) {
+          if (typeof (data[i]) == 'string') {
+            log += data[i];
+          }
+        }
+        switch (log) {
+          case 'public':
+            console.log('public');
+            lastPage = '/'+hash;
+            window.location = '/#/login';
+          break;
+          case 'restricted':
+            console.log('restricted');
+            console.log(lastPage);
+            window.location = lastPage;
+          break;
+          case 'permitted':
+            console.log('permitted');
+            if (hash != '#/login') {lastPage = '/'+hash;}
+          break;
+        }
+      });
+    };
     _.extend($scope, {
       jobs: jobs,
       labels: labels,
@@ -195,9 +223,7 @@
    * @param  {angular injection} $scope [description]
    */
   loginController = function($scope, $resource) {
-    if (login) {
-      window.location = lastPage;
-    }
+    $scope.common = commonScope.common;
     $scope.post = function (username, password) {
       var resource = $resource('/login',{}, {save: {method: 'POST'}});
       results = resource.save({username: username, password: password});
@@ -211,7 +237,7 @@
         switch (log) {
           case 'login successful':
             console.log('login successful');
-            login = true;
+            console.log(lastPage);
             window.location = lastPage;
           break;
           case 'password incorrect':
@@ -241,7 +267,7 @@
    * the function to control a private examl=ple page
    */
   pvexampleController = function ($scope, $resource) {
-    lastPage = '/#/example';
+  
   },
 
   /**

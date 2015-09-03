@@ -57,6 +57,11 @@ db = function (response, address, queryOptions, method, cookies, postData) {
   }
   if (method == 'post') {
     databaseHandler.dbRequest(username, queryObj.selectionArray, queryObj.command, queryObj.data, function(results) {
+      if (userDecryptor(cookies) != 'public') {
+        response.writeHead(200, {
+          'set-cookie': 'user='+cookies.user+';httpOnly=true;expires='+new Date(new Date().getTime()+15000).toUTCString()
+        });
+      }
       response.write(results);
       response.end();
     });
@@ -66,19 +71,21 @@ db = function (response, address, queryOptions, method, cookies, postData) {
 restricted = function (response, address, queryOptions, method, cookies, postData) {
   username = userDecryptor(cookies);
   queryObj = querystring.parse(queryOptions);
-  databaseHandler.dbCheckPermission(username, 'download', address, function (permission) {
+  databaseHandler.dbCheckPermission(username, 'download', queryObj.hash, function (permission) {
     if (permission) {
-      fileLoader.load(response, '', address, cookies);
+      response.writeHead(200);
+      response.end('permitted');
     } else {
       if (username == 'public') {
-        fileLoader.load(response, 'page='+address,'/restricted/login.html', cookies);
+        response.writeHead(200);
+        response.end('public');
       } else {
-        fileLoader.load(response, '','/restricted/accessDenied.html', cookies);
+        response.writeHead(200);
+        response.end('restricted');
       }
     }
   });
 };
-
 save = function (response, address, queryOptions, method, cookies, postData) {
   if (method == 'post') {
     console.log(queryOptions);
@@ -87,11 +94,6 @@ save = function (response, address, queryOptions, method, cookies, postData) {
 
 login = function (response, address, queryOptions, method, cookies, postData) {
   postObject = JSON.parse(postData);
-  if (cookies.page) {
-    lastPage = '/#/'+ addressPurifier(cookies.page);
-  } else {
-    lastPage = '/';
-  }
   if (method == 'post' && address == '/login') {
     if (postObject.username == 'admin') {
       if (postObject.password == 'JPDrom27-') {
@@ -128,13 +130,10 @@ login = function (response, address, queryOptions, method, cookies, postData) {
           exportFields: ['ID']
         }
       ];
-      console.log(usernameSelectionArray[0].conditions, passwordSelectionArray[0].conditions);
       databaseHandler.dbRequest('public', usernameSelectionArray, 'select', '', function(results){
-        console.log('dbRequest');
         if (results.length == 1) {
           databaseHandler.dbRequest('public', passwordSelectionArray, 'select', '', function(results){
             if (results.length == 1) {
-              console.log(postObject);
               response.writeHead(200, {
                 'set-cookie': 'user='+crypto.encrypt(postObject.username)+';httpOnly=true;expires='+new Date(new Date().getTime()+15000).toUTCString()
               });
@@ -165,9 +164,23 @@ logout = function (response, address, queryOptions, method, cookies, postData) {
   response.end();
 };
 
+postpone = function (response, address, queryOptions, method, cookies, postData) {
+  if (userDecryptor(cookies) != 'public') {
+    response.writeHead(200, {
+      'set-cookie': 'user='+cookies.user+';httpOnly=true;expires='+new Date(new Date().getTime()+15000).toUTCString()
+    });
+  } else {
+    response.writeHead(200, {
+      'set-cookie': 'user='+crypto.encrypt('public')+';httpOnly=true'
+    });
+  }
+  response.end();
+};
+
 exports['main'] = main;
 exports['db'] = db;
 exports['restricted'] = restricted;
 exports['save'] = save;
 exports['login'] = login;
 exports['logout'] = logout;
+exports['postpone'] = postpone;
