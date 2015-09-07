@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-  <title>Job Tags</title>
+  <title>total title</title>
   <link rel="stylesheet" href="components/1Grids/1grids.css">
   <link rel="stylesheet" href="components/1fonts/1fonts.css">
   <link rel="stylesheet" href="components/fontawesome/css/font-awesome.min.css">
@@ -46,7 +46,6 @@
     document.addEventListener('WebComponentsReady', function () {
       var scope = document.querySelector('template[is=dom-bind]');
       scope.common = commonScope.common;
-      scope.common.val = function(value) {console.log(value)};
     });
     window.onhashchange = function() {
       commonScope.common.show = false;
