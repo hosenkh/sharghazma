@@ -27,7 +27,7 @@
 </head>
 <body ng-app="router" unresolved>
   <template is="dom-bind">
-    <div ng-view></div>    
+    <div ng-view ng-show="{{common.show}}"></div>    
   </template>
   <script type="text/javascript" src="components/angular/angular.min.js"></script>
   <script type="text/javascript" src="components/angular-resource/angular-resource.min.js"></script>
@@ -36,8 +36,10 @@
   <script type="text/javascript" src="components/webcomponentsjs/webcomponents-lite.js"></script>
   <script type="text/javascript" src="src/polymerScripts.js"></script>
   <script type="text/javascript">
-    commonScope = {common:{}};
+    commonScope = {common:{lastPage : '/#/', lastPagePermitted: '/#/'}};
   </script>
+  <script type="text/javascript" src="src/l10n.js"></script>
+  <script type="text/javascript" src="src/i18n.js"></script>
   <script type="text/javascript" src="src/controllers.js"></script>
   <script type="text/javascript" src="src/router.js"></script>
   <script>
@@ -47,13 +49,12 @@
       scope.common.val = function(value) {console.log(value)};
     });
     window.onhashchange = function() {
-      commonScope.common.getPermission(window.location.hash, function(permission) {
+      commonScope.common.show = false;
+      commonScope.common.getPermission(window.location.hash) {
         console.log(permission);
         setTimeout(function(){
-          if (document.getElementById('d') && !permission) {
-            window.location = '/#/login';
-          }
           commonScope.common.postpone();
+          commonScope.common.show = true;
         }, 200);
       });
     };

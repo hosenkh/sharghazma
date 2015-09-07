@@ -71,20 +71,26 @@ db = function (response, address, queryOptions, method, cookies, postData) {
 restricted = function (response, address, queryOptions, method, cookies, postData) {
   username = userDecryptor(cookies);
   queryObj = querystring.parse(queryOptions);
-  databaseHandler.dbCheckPermission(username, 'download', queryObj.hash, function (permission) {
-    if (permission) {
-      response.writeHead(200);
-      response.end('permitted');
-    } else {
-      if (username == 'public') {
+  if (queryObj.hash == '/#/login' && username != 'public') {
+    response.writeHead(200);
+    response.end('goHome');
+  } else {
+    databaseHandler.dbCheckPermission(username, 'download', queryObj.hash, function (permission) {
+      if (permission) {
         response.writeHead(200);
-        response.end('public');
+        response.end('permitted');
       } else {
-        response.writeHead(200);
-        response.end('restricted');
+        if (username == 'public') {
+          response.writeHead(200);
+          response.end('public');
+        } else {
+          response.writeHead(200);
+          response.end('restricted');
+        }
       }
-    }
-  });
+    });
+  }
+    
 };
 save = function (response, address, queryOptions, method, cookies, postData) {
   if (method == 'post') {

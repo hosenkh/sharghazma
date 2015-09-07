@@ -3,7 +3,6 @@
   mainJSON,
   jobs = [],
   selected = {},
-  lastPage = '/#/',
 
   /**
    * the function to define a new job which adds a single job name to the jobs array
@@ -171,17 +170,20 @@
         switch (log) {
           case 'public':
             console.log('public');
-            lastPage = '/'+hash;
+            commonScope.common.lastPage = '/'+hash;
             window.location = '/#/login';
           break;
           case 'restricted':
             console.log('restricted');
-            console.log(lastPage);
-            window.location = lastPage;
+            console.log(commonScope.common.lastPage);
+            window.location = commonScope.common.lastPagePermitted;
           break;
           case 'permitted':
             console.log('permitted');
-            if (hash != '#/login') {lastPage = '/'+hash;}
+            if (hash != '#/login') {commonScope.common.lastPagePermitted = commonScope.common.lastPage = '/'+hash;}
+          break;
+          case 'goHome':
+            window.location = '/';
           break;
         }
       });
@@ -237,8 +239,8 @@
         switch (log) {
           case 'login successful':
             console.log('login successful');
-            console.log(lastPage);
-            window.location = lastPage;
+            console.log(commonScope.common.lastPage);
+            window.location = commonScope.common.lastPage;
           break;
           case 'password incorrect':
             $scope.password = '';
