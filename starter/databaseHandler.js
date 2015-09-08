@@ -279,8 +279,14 @@ showLinkPermission = function (username, content, resultFunction) {
       exportFields: ['ID']
     },
     {
+      table: "user_permissions",
+      conditions: {},
+      importedCondition: "UserId",
+      exportFields: ["PermissionId"]
+    },
+    {
       table: 'permissions',
-      importedCondition: ['UserId'],
+      importedCondition: ['PermissionNameId'],
       conditions: {
         command: ['show'],
         content: [content]

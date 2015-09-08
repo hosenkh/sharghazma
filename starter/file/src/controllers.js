@@ -9,7 +9,7 @@
     $scope.common.postpone = function () {
       $resource('/postpone').get();
     };
-    $scope.common.getPermission = function (hash) {
+    $scope.common.getPermission = function (hash, resultFunction) {
       $resource('/restricted', {hash: hash}).get().$promise.then(function(data) {
         var log = '';
         for (var i in data) {
@@ -36,6 +36,7 @@
             window.location = '/';
           break;
         }
+        resultFunction(log);
       });
     };
   },

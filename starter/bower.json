@@ -1,0 +1,21 @@
+{
+  "name": "YourProject'sName",
+  "main": "index.js",
+  "version": "0.0.1",
+  "homepage": "https://yourhome.page",
+  "authors": [
+    "Hosein Khabbazian <hosenkh@gmail.com>"
+  ],
+  "description": "Your project's description",
+  "moduleType": [
+    "node"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

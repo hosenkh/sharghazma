@@ -35,28 +35,11 @@
   <script type="text/javascript" src="components/lodash/lodash.min.js"></script>
   <script type="text/javascript" src="components/webcomponentsjs/webcomponents-lite.js"></script>
   <script type="text/javascript" src="src/polymerScripts.js"></script>
-  <script type="text/javascript">
-    commonScope = {common:{lastPage : '/#/', lastPagePermitted: '/#/'}};
-  </script>
+  <script type="text/javascript" src="src/commonScopeCreator.js"></script>
   <script type="text/javascript" src="src/l10n.js"></script>
   <script type="text/javascript" src="src/i18n.js"></script>
   <script type="text/javascript" src="controllers.js"></script>
   <script type="text/javascript" src="router.js"></script>
-  <script>
-    document.addEventListener('WebComponentsReady', function () {
-      var scope = document.querySelector('template[is=dom-bind]');
-      scope.common = commonScope.common;
-    });
-    window.onhashchange = function() {
-      commonScope.common.show = false;
-      commonScope.common.getPermission(window.location.hash) {
-        console.log(permission);
-        setTimeout(function(){
-          commonScope.common.postpone();
-          commonScope.common.show = true;
-        }, 200);
-      });
-    };
-  </script>
+  <script type="text/javascript" src="lastScriptOnLoad.js"></script>
 </body>
 </html>
