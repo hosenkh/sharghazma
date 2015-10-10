@@ -46,7 +46,7 @@ levelSelector = function (table, importedCondition ,conditions, exportFields, ex
 dbStart = function () {
   connection = mysql.createConnection({user: 'root', password: ''});
   connection.connect();
-  connection.query('USE test');
+  connection.query('USE indefinitely-dynamic-structure');
 };
 
 dbEnd = function () {
