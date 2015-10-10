@@ -14,6 +14,10 @@
         templateUrl: 'partials/login.html',
         controller: 'loginControl'
       })
+      .when('/databaseuserinterface', {
+        templateUrl: 'partials/dbUI.html',
+        controller: 'dbUIController'
+      })
       .otherwise({
         redirectTo: '/home'
       });
