@@ -1,5 +1,5 @@
 (function (ng, _, undefined){
-  
+  var
   /**
    * the controller for the main page
    * @param  {angular injection} $scope the scope
